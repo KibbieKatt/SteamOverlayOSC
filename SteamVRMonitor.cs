@@ -4,14 +4,14 @@ using System.Runtime.InteropServices;
 namespace SteamVRDashOSC;
 
 // Checks and maintains SteamVR overlay open state
-public sealed class SteamVRDashMonitor : IDisposable
+public sealed class SteamVRMonitor : IDisposable
 {
     private readonly TimeSpan _pollInterval;
     private readonly TimeSpan _reconnectDelay;
     private bool _connected;
     private DashboardSnapshot? _lastSnapshot;
 
-    public SteamVRDashMonitor(TimeSpan pollInterval, TimeSpan reconnectDelay)
+    public SteamVRMonitor(TimeSpan pollInterval, TimeSpan reconnectDelay)
     {
         _pollInterval = pollInterval;
         _reconnectDelay = reconnectDelay;

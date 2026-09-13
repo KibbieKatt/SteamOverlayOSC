@@ -17,7 +17,7 @@ Console.CancelKeyPress += (_, eventArgs) =>
 
 using var publisher = new OscPublisher(options.OscHost, options.OscPort);
 
-var monitor = new SteamVRDashMonitor(options.PollInterval, options.ReconnectDelay);
+var monitor = new SteamVRMonitor(options.PollInterval, options.ReconnectDelay);
 monitor.StateChanged += snapshot =>
 {
     Console.WriteLine($"{snapshot.ObservedAt:O}  {snapshot.State,-11} {snapshot.Detail}");
