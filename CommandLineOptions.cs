@@ -34,7 +34,7 @@ public sealed record CommandLineOptions(
                     showHelp = true;
                     break;
                 case "--poll-ms":
-                    pollInterval = TimeSpan.FromMilliseconds(ParseMilliseconds(NextValue(), argument, 50, 10_000));
+                    pollInterval = TimeSpan.FromMilliseconds(ParseMilliseconds(NextValue(), argument, 50, 1_000));
                     break;
                 case "--reconnect-ms":
                     reconnectDelay = TimeSpan.FromMilliseconds(ParseMilliseconds(NextValue(), argument, 250, 60_000));
@@ -62,7 +62,7 @@ public sealed record CommandLineOptions(
               SteamVRDashOSC [options]
 
             Options:
-              --poll-ms <50-10000>        Query interval; default: 250
+              --poll-ms <50-1000>        SteamVR poll interval; default: 250
               --reconnect-ms <250-60000>  SteamVR retry interval; default: 2000
               --osc-host <host>            VRChat OSC destination; default: 127.0.0.1
               --osc-port <1-65535>         VRChat OSC port; default: 9000

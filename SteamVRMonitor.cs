@@ -34,6 +34,12 @@ public sealed class SteamVRMonitor : IDisposable
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
+                    if (IsSteamVrQuitting())
+                    {
+                        Publish(DashboardState.Unavailable, "SteamVR is shutting down.");
+                        break;
+                    }
+
                     // The magic sauce, checks if the overlay is open
                     var isDashboardVisible = OpenVR.Overlay.IsDashboardVisible();
                     Publish(
@@ -58,6 +64,27 @@ public sealed class SteamVRMonitor : IDisposable
 
             await Task.Delay(_reconnectDelay, cancellationToken);
         }
+    }
+
+    private static bool IsSteamVrQuitting()
+    {
+        var system = OpenVR.System
+            ?? throw new InvalidOperationException("SteamVR system interface was lost.");
+        var vrEvent = new VREvent_t();
+        var eventSize = (uint)Marshal.SizeOf<VREvent_t>();
+
+        // Bound event processing so a busy queue cannot delay polling indefinitely.
+        for (var count = 0; count < 64 && system.PollNextEvent(ref vrEvent, eventSize); count++)
+        {
+            if ((EVREventType)vrEvent.eventType == EVREventType.VREvent_Quit)
+            {
+                // Give us time to disconnect before SteamVR forcibly terminates the process.
+                system.AcknowledgeQuit_Exiting();
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private bool TryConnect(out string detail)
