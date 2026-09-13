@@ -121,6 +121,7 @@ public sealed class SteamVRMonitor : IDisposable
         }
         catch (Exception exception) when (IsOpenVrConnectionException(exception))
         {
+            Disconnect(forceShutdown: true);
             detail = $"SteamVR is unavailable ({exception.Message}).";
             return false;
         }
