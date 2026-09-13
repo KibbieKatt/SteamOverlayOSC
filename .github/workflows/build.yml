@@ -53,4 +53,3 @@ jobs:
           name: SteamVRDashOSC-win-x64-${{ github.sha }}
           path: ./release/SteamVRDashOSC.exe
           if-no-files-found: error
-          retention-days: 30
