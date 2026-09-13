@@ -33,7 +33,14 @@ public sealed class OscPublisher : IDisposable
             if (_disposed)
                 return;
 
-            SendBoolean(AvatarParameterAddress, snapshot.IsOpen);
+            try
+            {
+                SendBoolean(AvatarParameterAddress, snapshot.IsOpen);
+            }
+            catch (SocketException exception)
+            {
+                Console.Error.WriteLine($"Warning: Could not send OSC update: {exception.Message}");
+            }
         }
     }
 
