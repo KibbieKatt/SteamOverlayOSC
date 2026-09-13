@@ -15,6 +15,12 @@ Run the app with VRChat
 * `--osc-host` VRChat OSC destination; default: 127.0.0.1
 * `--osc-port` VRChat OSC port; default: 9000
 
+## Building From Source
+
+```
+dotnet publish SteamVRDashOSC.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=embedded
+```
+
 ## License
 
 MIT
