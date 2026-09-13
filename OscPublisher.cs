@@ -7,10 +7,16 @@ namespace SteamVRDashOSC;
 /// <summary>Publishes the dashboard state to VRChat's isOverlayOpen Bool parameter.</summary>
 public sealed class OscPublisher : IDisposable
 {
+    // Overlay indicator parameter
     public const string AvatarParameterAddress = "/avatar/parameters/isOverlayOpen";
-
+    // UDP Client for OSC
     private readonly UdpClient _client = new();
+    // OSC address
     private readonly IPEndPoint _destination;
+    // Lock to prevent races between sending and closing
+    private readonly object _sendLock = new();
+    // True when session closed
+    private bool _disposed;
 
     public OscPublisher(string host, int port)
     {
@@ -22,7 +28,13 @@ public sealed class OscPublisher : IDisposable
 
     public void Publish(DashboardSnapshot snapshot)
     {
-        SendBoolean(AvatarParameterAddress, snapshot.IsOpen);
+        lock (_sendLock)
+        {
+            if (_disposed)
+                return;
+
+            SendBoolean(AvatarParameterAddress, snapshot.IsOpen);
+        }
     }
 
     private void SendBoolean(string address, bool value)
@@ -59,5 +71,29 @@ public sealed class OscPublisher : IDisposable
             ?? throw new ArgumentException($"No IPv4 address was found for '{host}'.", nameof(host));
     }
 
-    public void Dispose() => _client.Dispose();
+    // Handles ending the OSC session and closing the overlay indicator
+    public void Dispose()
+    {
+        lock (_sendLock)
+        {
+            // No-op if already closed
+            if (_disposed)
+                return;
+
+            // No later Publish call can send true after the final false.
+            _disposed = true;
+            try
+            {
+                SendBoolean(AvatarParameterAddress, false);
+            }
+            catch (SocketException)
+            {
+                // Ignore if final send failed
+            }
+            finally
+            {
+                _client.Dispose();
+            }
+        }
+    }
 }
