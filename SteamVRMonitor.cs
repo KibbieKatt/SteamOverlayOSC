@@ -41,7 +41,9 @@ public sealed class SteamVRMonitor : IDisposable
                     }
 
                     // The magic sauce, checks if the overlay is open
-                    var isDashboardVisible = OpenVR.Overlay.IsDashboardVisible();
+                    var overlay = OpenVR.Overlay
+                        ?? throw new InvalidOperationException("SteamVR overlay interface was lost.");
+                    var isDashboardVisible = overlay.IsDashboardVisible();
                     Publish(
                         isDashboardVisible ? DashboardState.Open : DashboardState.Closed,
                         isDashboardVisible ? "SteamVR dashboard is visible." : "SteamVR dashboard is hidden.");
