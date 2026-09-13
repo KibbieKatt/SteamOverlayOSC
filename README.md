@@ -18,7 +18,7 @@ Run the app with VRChat
 ## Building From Source
 
 ```
-dotnet publish SteamVRDashOSC.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=embedded
+dotnet publish SteamVRDashOSC.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=embedded -o ./release
 ```
 
 ## License
