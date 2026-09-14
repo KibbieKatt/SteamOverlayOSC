@@ -165,6 +165,7 @@ public sealed class SteamVRMonitor : IDisposable
         StateChanged?.Invoke(snapshot);
     }
 
+    // Disconnects OpenVR session. Assumes OSC resets sent separately
     private void Disconnect(bool forceShutdown = false)
     {
         if (!_connected && !forceShutdown)

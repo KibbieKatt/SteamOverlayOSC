@@ -10,7 +10,7 @@ public sealed record CommandLineOptions(
     public static CommandLineOptions Parse(string[] args)
     {
         var showHelp = false;
-        var eventBatchInterval = TimeSpan.FromMilliseconds(250);
+        var eventBatchInterval = TimeSpan.FromMilliseconds(100);
         var reconnectDelay = TimeSpan.FromSeconds(2);
         var oscHost = "127.0.0.1";
         var oscPort = 9000;
@@ -62,7 +62,7 @@ public sealed record CommandLineOptions(
               SteamVRDashOSC [options]
 
             Options:
-              --event-ms <50-1000>        SteamVR event batch processing interval; default: 250
+              --event-ms <50-1000>        SteamVR event batch processing interval; default: 100
               --reconnect-ms <250-60000>  SteamVR retry interval; default: 2000
               --osc-host <host>            VRChat OSC destination; default: 127.0.0.1
               --osc-port <1-65535>         VRChat OSC port; default: 9000
