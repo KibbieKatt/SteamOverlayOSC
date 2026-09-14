@@ -56,10 +56,10 @@ public sealed record CommandLineOptions(
     public static void WriteHelp()
     {
         Console.WriteLine("""
-            SteamVRDashOSC - sends SteamVR dashboard state to VRChat.
+            SteamOverlayOSC - sends SteamVR dashboard state to VRChat.
 
             Usage:
-              SteamVRDashOSC [options]
+              SteamOverlayOSC [options]
 
             Options:
               --event-ms <50-1000>        SteamVR event batch processing interval; default: 100
@@ -69,7 +69,9 @@ public sealed record CommandLineOptions(
               --help, -h                   Show this help
 
             OSC output:
-              /avatar/parameters/isOverlayOpen  bool  true when the SteamVR dashboard is visible
+              /avatar/parameters/isOverlayOpen  bool  True when SteamVR dashboard is open
+              /avatar/parameters/isKeyboardOpen  bool  True when SteamVR keyboard is open
+              /avatar/parameters/isSteamOverlay  bool  True when companion app is running
             """);
     }
 

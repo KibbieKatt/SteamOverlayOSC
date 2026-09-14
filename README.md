@@ -4,11 +4,11 @@ SteamOverlayOSC is a companion app that links the SteamVR overlay status with av
 
 The app attempts to handle late starts and disconnects, and can be started before or after SteamVR or VRChat. It will automatically detect SteamVR closing and reconnect when it becomes available again.
 
-Parameters `isOverlayOpen` as well as `isSteamOverlay` and `isKeyboardOpen` are set to false when exiting or when SteamVR connection is lost to avoid avatar assets getting stuck open.
+Parameters `isOverlayOpen` and `isKeyboardOpen` are set to false when exiting or when SteamVR connection is lost to avoid avatar assets getting stuck open. `isSteamOverlay` stays true as long as the companion app is open.
 
-* `isOverlayOpen`: Set to true when SteamVR overlay open is detected
+* `isOverlayOpen`: True when SteamVR dashboard is open
+* `isKeyboardOpen`: True when SteamVR keyboard is open
 * `isSteamOverlay`: Always set to true so that assets can perform SteamVR specific behavior
-* `isKeyboardOpen`: Currently always set to true due to outdated OpenVR API SDK limitations
 
 ## Usage
 
