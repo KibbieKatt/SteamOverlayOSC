@@ -6,14 +6,14 @@ namespace SteamOverlayOSC;
 // Checks and maintains SteamVR overlay open state
 public sealed class SteamVRMonitor : IDisposable
 {
-    private readonly TimeSpan _pollInterval;
+    private readonly TimeSpan _eventBatchInterval;
     private readonly TimeSpan _reconnectDelay;
     private bool _connected;
     private DashboardSnapshot? _lastSnapshot;
 
-    public SteamVRMonitor(TimeSpan pollInterval, TimeSpan reconnectDelay)
+    public SteamVRMonitor(TimeSpan eventBatchInterval, TimeSpan reconnectDelay)
     {
-        _pollInterval = pollInterval;
+        _eventBatchInterval = eventBatchInterval;
         _reconnectDelay = reconnectDelay;
     }
 
@@ -32,23 +32,56 @@ public sealed class SteamVRMonitor : IDisposable
 
             try
             {
+                // Seed OSC / state with current overlay status
+                var overlay = OpenVR.Overlay
+                    ?? throw new InvalidOperationException("SteamVR overlay interface was lost.");
+                var isDashboardVisible = overlay.IsDashboardVisible();
+                Publish(
+                    isDashboardVisible ? DashboardState.Open : DashboardState.Closed,
+                    isDashboardVisible ? "SteamVR dashboard is visible." : "SteamVR dashboard is hidden.");
+
+                var vrEvent = new VREvent_t();
+                var eventSize = (uint)Marshal.SizeOf<VREvent_t>();
+                var quitRequested = false;
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    if (IsSteamVrQuitting())
+                    var system = OpenVR.System
+                        ?? throw new InvalidOperationException("SteamVR system interface was lost.");
+
+                    // Bound each batch and check cancellation between events.
+                    for (var count = 0; count < 64 && !quitRequested &&
+                        !cancellationToken.IsCancellationRequested &&
+                        system.PollNextEvent(ref vrEvent, eventSize); count++)
                     {
-                        Publish(DashboardState.Unavailable, "SteamVR is shutting down.");
-                        break;
+                        switch ((EVREventType)vrEvent.eventType)
+                        {
+                            case EVREventType.VREvent_Quit:
+                                // Give us time to disconnect before SteamVR terminates the process.
+                                system.AcknowledgeQuit_Exiting();
+                                Publish(DashboardState.Unavailable, "SteamVR is shutting down.");
+                                quitRequested = true;
+                                break;
+                            case EVREventType.VREvent_DashboardActivated:
+                                Publish(DashboardState.Open, "SteamVR dashboard is visible.");
+                                break;
+                            case EVREventType.VREvent_DashboardDeactivated:
+                                Publish(DashboardState.Closed, "SteamVR dashboard is hidden.");
+                                break;
+                            case EVREventType.VREvent_KeyboardOpened_Global:
+                                Console.WriteLine("Keyboard opened");
+                                // Keyboard opened
+                                break;
+                            case EVREventType.VREvent_KeyboardClosed_Global:
+                                Console.WriteLine("Keyboard closed");
+                                // Keyboard closed
+                                break;
+                        }
                     }
 
-                    // The magic sauce, checks if the overlay is open
-                    var overlay = OpenVR.Overlay
-                        ?? throw new InvalidOperationException("SteamVR overlay interface was lost.");
-                    var isDashboardVisible = overlay.IsDashboardVisible();
-                    Publish(
-                        isDashboardVisible ? DashboardState.Open : DashboardState.Closed,
-                        isDashboardVisible ? "SteamVR dashboard is visible." : "SteamVR dashboard is hidden.");
+                    if (quitRequested)
+                        break;
 
-                    await Task.Delay(_pollInterval, cancellationToken);
+                    await Task.Delay(_eventBatchInterval, cancellationToken);
                 }
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -66,27 +99,6 @@ public sealed class SteamVRMonitor : IDisposable
 
             await Task.Delay(_reconnectDelay, cancellationToken);
         }
-    }
-
-    private static bool IsSteamVrQuitting()
-    {
-        var system = OpenVR.System
-            ?? throw new InvalidOperationException("SteamVR system interface was lost.");
-        var vrEvent = new VREvent_t();
-        var eventSize = (uint)Marshal.SizeOf<VREvent_t>();
-
-        // Bound event processing so a busy queue cannot delay polling indefinitely.
-        for (var count = 0; count < 64 && system.PollNextEvent(ref vrEvent, eventSize); count++)
-        {
-            if ((EVREventType)vrEvent.eventType == EVREventType.VREvent_Quit)
-            {
-                // Give us time to disconnect before SteamVR forcibly terminates the process.
-                system.AcknowledgeQuit_Exiting();
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private bool TryConnect(out string detail)

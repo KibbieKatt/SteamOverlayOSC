@@ -2,7 +2,7 @@ namespace SteamOverlayOSC;
 
 public sealed record CommandLineOptions(
     bool ShowHelp,
-    TimeSpan PollInterval,
+    TimeSpan EventBatchInterval,
     TimeSpan ReconnectDelay,
     string OscHost,
     int OscPort)
@@ -10,7 +10,7 @@ public sealed record CommandLineOptions(
     public static CommandLineOptions Parse(string[] args)
     {
         var showHelp = false;
-        var pollInterval = TimeSpan.FromMilliseconds(250);
+        var eventBatchInterval = TimeSpan.FromMilliseconds(250);
         var reconnectDelay = TimeSpan.FromSeconds(2);
         var oscHost = "127.0.0.1";
         var oscPort = 9000;
@@ -33,8 +33,8 @@ public sealed record CommandLineOptions(
                 case "--help" or "-h":
                     showHelp = true;
                     break;
-                case "--poll-ms":
-                    pollInterval = TimeSpan.FromMilliseconds(ParseMilliseconds(NextValue(), argument, 50, 1_000));
+                case "--event-ms":
+                    eventBatchInterval = TimeSpan.FromMilliseconds(ParseMilliseconds(NextValue(), argument, 50, 1_000));
                     break;
                 case "--reconnect-ms":
                     reconnectDelay = TimeSpan.FromMilliseconds(ParseMilliseconds(NextValue(), argument, 250, 60_000));
@@ -50,7 +50,7 @@ public sealed record CommandLineOptions(
             }
         }
 
-        return new CommandLineOptions(showHelp, pollInterval, reconnectDelay, oscHost, oscPort);
+        return new CommandLineOptions(showHelp, eventBatchInterval, reconnectDelay, oscHost, oscPort);
     }
 
     public static void WriteHelp()
@@ -62,7 +62,7 @@ public sealed record CommandLineOptions(
               SteamVRDashOSC [options]
 
             Options:
-              --poll-ms <50-1000>        SteamVR poll interval; default: 250
+              --event-ms <50-1000>        SteamVR event batch processing interval; default: 250
               --reconnect-ms <250-60000>  SteamVR retry interval; default: 2000
               --osc-host <host>            VRChat OSC destination; default: 127.0.0.1
               --osc-port <1-65535>         VRChat OSC port; default: 9000
