@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace SteamVRDashOSC;
+namespace SteamOverlayOSC;
 
 /// <summary>Publishes the dashboard state to VRChat's isOverlayOpen Bool parameter.</summary>
 public sealed class OscPublisher : IDisposable

@@ -27,7 +27,7 @@ jobs:
 
       - name: Build self-contained executable
         run: >-
-          dotnet publish SteamVRDashOSC.csproj
+          dotnet publish SteamOverlayOSC.csproj
           -c Release
           -r win-x64
           --self-contained true
@@ -39,10 +39,10 @@ jobs:
 
       - name: Verify executable and startup
         run: |
-          if (-not (Test-Path -LiteralPath ./release/SteamVRDashOSC.exe -PathType Leaf)) {
-            throw 'Expected executable was not found: ./release/SteamVRDashOSC.exe'
+          if (-not (Test-Path -LiteralPath ./release/SteamOverlayOSC.exe -PathType Leaf)) {
+            throw 'Expected executable was not found: ./release/SteamOverlayOSC.exe'
           }
-          & ./release/SteamVRDashOSC.exe --help
+          & ./release/SteamOverlayOSC.exe --help
           if ($LASTEXITCODE -ne 0) {
             throw 'The published executable failed its startup check.'
           }
@@ -50,6 +50,6 @@ jobs:
       - name: Upload executable
         uses: actions/upload-artifact@v7
         with:
-          name: SteamVRDashOSC-win-x64-${{ github.sha }}
-          path: ./release/SteamVRDashOSC.exe
+          name: SteamOverlayOSC-win-x64-${{ github.sha }}
+          path: ./release/SteamOverlayOSC.exe
           if-no-files-found: error

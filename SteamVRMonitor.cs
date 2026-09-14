@@ -1,7 +1,7 @@
 using Valve.VR;
 using System.Runtime.InteropServices;
 
-namespace SteamVRDashOSC;
+namespace SteamOverlayOSC;
 
 // Checks and maintains SteamVR overlay open state
 public sealed class SteamVRMonitor : IDisposable

@@ -1,4 +1,4 @@
-using SteamVRDashOSC;
+using SteamOverlayOSC;
 using System.Runtime.InteropServices;
 
 var options = CommandLineOptions.Parse(args);

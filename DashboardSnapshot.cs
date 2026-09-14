@@ -1,4 +1,4 @@
-namespace SteamVRDashOSC;
+namespace SteamOverlayOSC;
 
 public enum DashboardState
 {
