@@ -18,6 +18,7 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v7
         with:
+          submodules: recursive
           persist-credentials: false
 
       - name: Set up .NET 8

@@ -1,0 +1,3 @@
+[submodule "third_party/OVRSharp"]
+	path = third_party/OVRSharp
+	url = https://github.com/matterworksint/OVRSharp.git

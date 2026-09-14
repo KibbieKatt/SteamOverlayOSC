@@ -25,6 +25,14 @@ These shouldn't need to be adjusted, but may be useful in specific scenarios
 
 ## Building From Source
 
+Fetch updated OVRSharp submodule:
+
+```
+git submodule update --init --recursive
+```
+
+Build self-contained binary:
+
 ```
 dotnet publish SteamOverlayOSC.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=embedded -o ./release
 ```

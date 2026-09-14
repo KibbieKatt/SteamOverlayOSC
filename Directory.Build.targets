@@ -1,0 +1,8 @@
+<Project>
+  <!-- The fork packages native libraries for NuGet. A source reference needs the
+       Windows DLL beside the application, including in the single-file bundle. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'OVRSharp'">
+    <Content Remove="lib/linux64/libopenvr_api.so;lib/linuxarm64/libopenvr_api.so" />
+    <Content Update="lib/win64/openvr_api.dll" Link="openvr_api.dll" />
+  </ItemGroup>
+</Project>

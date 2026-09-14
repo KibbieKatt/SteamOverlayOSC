@@ -5,9 +5,12 @@
     <PlatformTarget>x64</PlatformTarget>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
+    <DefaultItemExcludes>$(DefaultItemExcludes);third_party/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OVRSharp" Version="1.2.0" />
+    <ProjectReference Include="third_party/OVRSharp/OVRSharp/OVRSharp.csproj" />
+    <EmbeddedResource Include="third_party/OVRSharp/LICENSE" LogicalName="ThirdParty.OVRSharp.LICENSE" />
   </ItemGroup>
 </Project>
