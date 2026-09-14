@@ -42,8 +42,7 @@ public sealed class OscPublisher : IDisposable
                 }
                 // Send keyboard / steamvr params here since vrchat may be started later
                 SendBoolean(SteamVRParameterAddress, true);
-                SendBoolean(KeyboardOpenParameterAddress, true);
-
+                SendBoolean(KeyboardOpenParameterAddress, snapshot.IsKeyboardOpen);
                 SendBoolean(AvatarParameterAddress, snapshot.IsDashboardOpen);
             }
         }

@@ -25,7 +25,7 @@ public sealed class SteamVRMonitor : IDisposable
         {
             if (!TryConnect(out var connectionDetail))
             {
-                Publish(DashboardState.Unavailable, connectionDetail);
+                Publish(connectionDetail, dashboardState: DashboardState.Unavailable, keyboardState: KeyboardState.Closed);
                 await Task.Delay(_reconnectDelay, cancellationToken);
                 continue;
             }
@@ -37,8 +37,8 @@ public sealed class SteamVRMonitor : IDisposable
                     ?? throw new InvalidOperationException("SteamVR overlay interface was lost.");
                 var isDashboardVisible = overlay.IsDashboardVisible();
                 Publish(
-                    isDashboardVisible ? DashboardState.Open : DashboardState.Closed,
-                    isDashboardVisible ? "SteamVR dashboard is visible." : "SteamVR dashboard is hidden.");
+                    isDashboardVisible ? "SteamVR dashboard is visible." : "SteamVR dashboard is hidden.",
+                    dashboardState: isDashboardVisible ? DashboardState.Open : DashboardState.Closed);
 
                 var vrEvent = new VREvent_t();
                 var eventSize = (uint)Marshal.SizeOf<VREvent_t>();
@@ -58,22 +58,20 @@ public sealed class SteamVRMonitor : IDisposable
                             case EVREventType.VREvent_Quit:
                                 // Give us time to disconnect before SteamVR terminates the process.
                                 system.AcknowledgeQuit_Exiting();
-                                Publish(DashboardState.Unavailable, "SteamVR is shutting down.");
+                                Publish("SteamVR is shutting down.", dashboardState: DashboardState.Unavailable, keyboardState: KeyboardState.Closed);
                                 quitRequested = true;
                                 break;
                             case EVREventType.VREvent_DashboardActivated:
-                                Publish(DashboardState.Open, "SteamVR dashboard is visible.");
+                                Publish("SteamVR dashboard is visible.", dashboardState: DashboardState.Open);
                                 break;
                             case EVREventType.VREvent_DashboardDeactivated:
-                                Publish(DashboardState.Closed, "SteamVR dashboard is hidden.");
+                                Publish("SteamVR dashboard is hidden.", dashboardState: DashboardState.Closed);
                                 break;
                             case EVREventType.VREvent_KeyboardOpened_Global:
-                                Console.WriteLine("Keyboard opened");
-                                // Keyboard opened
+                                Publish("SteamVR keyboard is open.", keyboardState: KeyboardState.Open);
                                 break;
                             case EVREventType.VREvent_KeyboardClosed_Global:
-                                Console.WriteLine("Keyboard closed");
-                                // Keyboard closed
+                                Publish("SteamVR keyboard is closed.", keyboardState: KeyboardState.Closed);
                                 break;
                         }
                     }
@@ -90,7 +88,7 @@ public sealed class SteamVRMonitor : IDisposable
             }
             catch (Exception exception) when (IsOpenVrConnectionException(exception))
             {
-                Publish(DashboardState.Unavailable, $"SteamVR connection lost: {exception.Message}");
+                Publish($"SteamVR connection lost: {exception.Message}", dashboardState: DashboardState.Unavailable, keyboardState: KeyboardState.Closed);
             }
             finally
             {
@@ -148,11 +146,16 @@ public sealed class SteamVRMonitor : IDisposable
             or InvalidOperationException
             or SEHException;
 
-    private void Publish(DashboardState state, string detail)
+    private void Publish(string logMsg, DashboardState? dashboardState = null, KeyboardState? keyboardState = null)
     {
-        var snapshot = new DashboardSnapshot(state, KeyboardState.Closed, DateTimeOffset.UtcNow, detail);
+        var snapshot = new DashboardSnapshot(
+            dashboardState ?? _lastSnapshot?.DashboardState ?? DashboardState.Unavailable,
+            keyboardState ?? _lastSnapshot?.KeyboardState ?? KeyboardState.Closed,
+            DateTimeOffset.UtcNow,
+            logMsg);
         if (_lastSnapshot is not null &&
             _lastSnapshot.DashboardState == snapshot.DashboardState &&
+            _lastSnapshot.KeyboardState == snapshot.KeyboardState &&
             _lastSnapshot.LogMsg == snapshot.LogMsg)
         {
             return;
