@@ -28,19 +28,20 @@ public sealed class OscPublisher : IDisposable
 
     public void Publish(DashboardSnapshot snapshot)
     {
-        lock (_sendLock)
+        try
         {
-            if (_disposed)
-                return;
-
-            try
+            lock (_sendLock)
             {
+                if (_disposed)
+                {
+                    return;
+                }
                 SendBoolean(AvatarParameterAddress, snapshot.IsOpen);
             }
-            catch (SocketException exception)
-            {
-                Console.Error.WriteLine($"Warning: Could not send OSC update: {exception.Message}");
-            }
+        }
+        catch (SocketException exception)
+        {
+            Console.Error.WriteLine($"Warning: Could not send OSC update: {exception.Message}");
         }
     }
 
