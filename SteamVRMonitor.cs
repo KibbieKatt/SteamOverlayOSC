@@ -150,10 +150,10 @@ public sealed class SteamVRMonitor : IDisposable
 
     private void Publish(DashboardState state, string detail)
     {
-        var snapshot = new DashboardSnapshot(state, DateTimeOffset.UtcNow, detail);
+        var snapshot = new DashboardSnapshot(state, KeyboardState.Closed, DateTimeOffset.UtcNow, detail);
         if (_lastSnapshot is not null &&
-            _lastSnapshot.State == snapshot.State &&
-            _lastSnapshot.Detail == snapshot.Detail)
+            _lastSnapshot.DashboardState == snapshot.DashboardState &&
+            _lastSnapshot.LogMsg == snapshot.LogMsg)
         {
             return;
         }

@@ -16,7 +16,7 @@ var shutdownCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinua
 using var monitor = new SteamVRMonitor(options.EventBatchInterval, options.ReconnectDelay);
 monitor.StateChanged += snapshot =>
 {
-    Console.WriteLine($"{snapshot.ObservedAt:O}  {snapshot.State,-11} {snapshot.Detail}");
+    Console.WriteLine($"{snapshot.ObservedAt:O}  {snapshot.LogMsg}");
     publisher.Publish(snapshot);
 };
 

@@ -2,15 +2,23 @@ namespace SteamOverlayOSC;
 
 public enum DashboardState
 {
-    Unavailable,
-    Closed,
     Open,
+    Closed,
+    Unavailable,
+}
+
+public enum KeyboardState
+{
+    Open,
+    Closed,
 }
 
 public sealed record DashboardSnapshot(
-    DashboardState State,
+    DashboardState DashboardState,
+    KeyboardState KeyboardState,
     DateTimeOffset ObservedAt,
-    string Detail)
+    string LogMsg)
 {
-    public bool IsOpen => State is DashboardState.Open;
+    public bool IsDashboardOpen => DashboardState is DashboardState.Open;
+    public bool IsKeyboardOpen => KeyboardState is KeyboardState.Open;
 }

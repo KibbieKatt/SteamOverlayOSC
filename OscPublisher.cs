@@ -44,7 +44,7 @@ public sealed class OscPublisher : IDisposable
                 SendBoolean(SteamVRParameterAddress, true);
                 SendBoolean(KeyboardOpenParameterAddress, true);
 
-                SendBoolean(AvatarParameterAddress, snapshot.IsOpen);
+                SendBoolean(AvatarParameterAddress, snapshot.IsDashboardOpen);
             }
         }
         catch (SocketException exception)
