@@ -9,6 +9,10 @@ public sealed class OscPublisher : IDisposable
 {
     // Overlay indicator parameter
     public const string AvatarParameterAddress = "/avatar/parameters/isOverlayOpen";
+    // SteamVR flag for DXOverlay
+    public const string SteamVRParameterAddress = "/avatar/parameters/isSteamOverlay";
+    // Keyboard open parameter address
+    public const string KeyboardOpenParameterAddress = "/avatar/parameters/isKeyboardOpen";
     // UDP Client for OSC
     private readonly UdpClient _client = new();
     // OSC address
@@ -36,6 +40,10 @@ public sealed class OscPublisher : IDisposable
                 {
                     return;
                 }
+                // Send keyboard / steamvr params here since vrchat may be started later
+                SendBoolean(SteamVRParameterAddress, true);
+                SendBoolean(KeyboardOpenParameterAddress, true);
+
                 SendBoolean(AvatarParameterAddress, snapshot.IsOpen);
             }
         }
@@ -92,7 +100,10 @@ public sealed class OscPublisher : IDisposable
             _disposed = true;
             try
             {
+                // Cleanup params to not leave lingering state on exit
                 SendBoolean(AvatarParameterAddress, false);
+                SendBoolean(KeyboardOpenParameterAddress, false);
+                SendBoolean(SteamVRParameterAddress, false);
             }
             catch (SocketException)
             {
